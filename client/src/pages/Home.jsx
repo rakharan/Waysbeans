@@ -49,7 +49,7 @@ const Home = () => {
       )}
       <div className="mainContent">
         <div className="jumbotron w-full justify-center items-center flex mt-10">
-          <img src="src\assets\Jumbotron.png" alt="" />
+          <img src="/Jumbotron.png" alt="" />
         </div>
         <div className="productsList flex flex-wrap justify-center items-center gap-4 mt-[42px] mb-[51px]">
           {products !== undefined && products.length > 0 ? (

@@ -37,7 +37,7 @@ const Navbar = () => {
           <NavLink to="/">
             <img
               className="w-[163px]"
-              src="../src/assets/waysbean.png"
+              src="/waysbean.png"
               alt="logo waysbean"
             />
           </NavLink>
@@ -142,7 +142,7 @@ const Navbar = () => {
                       <NavLink to="/admin/addProduct" className="addProduct">
                         <li className="p-4 flex gap-x-4">
                           <div className="w-[24px]">
-                            <img src="../src/assets/coffeeIcon.svg" alt="" />
+                            <img src="/coffeeIcon.svg" alt="" />
                           </div>
                           Add Product
                         </li>
@@ -150,7 +150,7 @@ const Navbar = () => {
                       <NavLink to="/admin/listProduct" className="listProduct">
                         <li className="p-4 flex gap-x-4 border-t-[2px]">
                           <div className="w-[24px]">
-                            <img src="../src/assets/coffeeIcon.svg" alt="" />
+                            <img src="/coffeeIcon.svg" alt="" />
                           </div>
                           List Product
                         </li>

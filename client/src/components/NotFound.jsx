@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import error404 from "../assets/error404.webp";
+import error404 from "/error404.webp";
 import Button from "../parts/Button";
 const NotFound = () => {
   return (

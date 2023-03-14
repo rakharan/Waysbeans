@@ -107,7 +107,7 @@ const App = () => {
         <>
           <div className="min-h-screen flex justify-center items-center loadingScreen">
             <div>
-              <img src="../src/assets/waysbean.png" alt="" width="300px" />
+              <img src="waysbean.png" alt="" width="300px" />
             </div>
           </div>
         </>

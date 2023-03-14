@@ -2,6 +2,7 @@
   "name": "waysbean",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://sagameda.com",
   "type": "module",
   "scripts": {
     "dev": "vite",
