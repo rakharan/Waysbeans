@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"waysbeanapi/database"
 	"waysbeanapi/pkg/mysql"
 	"waysbeanapi/routes"
@@ -12,19 +14,23 @@ import (
 
 func main() {
 	e := echo.New()
+	errEnv := godotenv.Load()
+	if errEnv != nil {
+		panic("Failed to load env file")
+	}
 	mysql.DatabaseInit()
+	database.RunMigration()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.POST, echo.PATCH, echo.DELETE},
 		AllowHeaders: []string{"X-Requested-With", "Content-Type", "Authorization"},
 	}))
-	errEnv := godotenv.Load()
-	if errEnv != nil {
-		panic("Failed to load env file")
-	}
 	e.Static("/uploads", "./uploads")
-	database.RunMigration()
+
 	routes.RouteInit(e.Group("/api/v1"))
 
-	e.Logger.Fatal(e.Start("localhost:5000"))
+	var port = os.Getenv("PORT")
+
+	fmt.Println("server running localhost:" + port)
+	e.Logger.Fatal(e.Start(":" + port))
 }
