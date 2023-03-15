@@ -42,10 +42,6 @@ func (h *handlerProduct) FindProducts(c echo.Context) error {
 }
 
 func (h *handlerProduct) CreateProduct(c echo.Context) error {
-
-	fmt.Println(CLOUD_NAME)
-	fmt.Println(API_KEY)
-	fmt.Println(CLOUD_NAME)
 	filepath := c.Get("dataFile").(string)
 
 	userLogin := c.Get("userLogin")
@@ -134,7 +130,7 @@ func (h *handlerProduct) UpdateProduct(c echo.Context) error {
 
 	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
 
-	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "Waysbeans"})
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans"})
 	if err != nil {
 		fmt.Println(err.Error())
 	}
