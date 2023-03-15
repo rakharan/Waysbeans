@@ -111,6 +111,12 @@ const Cart = () => {
       });
     } catch (error) {
       // set popup when response failed
+      setShow(true);
+      setTitle("Payment Failed, Try Again Later");
+      setAlert("#DC3545");
+      setTimeout(() => {
+        setShow(false);
+      }, 2000);
     }
   });
 

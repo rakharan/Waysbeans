@@ -37,6 +37,7 @@ const Home = () => {
     setIsLoginModal(false);
     setPreview(null);
   };
+  console.log(products);
   return (
     <>
       {isModalVisible ? (

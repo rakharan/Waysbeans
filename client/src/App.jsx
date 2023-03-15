@@ -26,13 +26,14 @@ const App = () => {
   useEffect(() => {
     if (state.isLogin === false && !isLoading) {
       navigate("/");
-    } else {
-      if (state.user.role === "admin") {
-        navigate("/admin");
-      } else if (state.user.role === "user") {
-        navigate("/");
-      }
     }
+    // else {
+    //   if (state.user.role === "admin") {
+    //     navigate("/admin");
+    //   } else if (state.user.role === "user") {
+    //     navigate("/");
+    //   }
+    // }
     setAuthToken(localStorage.token);
   }, [state]);
 

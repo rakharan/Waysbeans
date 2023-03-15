@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -9,10 +11,17 @@ import (
 	"waysbeanapi/models"
 	"waysbeanapi/repositories"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
+
+var ctx = context.Background()
+var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+var API_KEY = os.Getenv("API_KEY")
+var API_SECRET = os.Getenv("API_SECRET")
 
 type handlerProduct struct {
 	ProductRepository repositories.ProductRepository
@@ -23,12 +32,8 @@ func HandlerProduct(ProductRepository repositories.ProductRepository) *handlerPr
 }
 
 func (h *handlerProduct) FindProducts(c echo.Context) error {
-	var path_file = "http://localhost:5000/uploads/"
 	products, err := h.ProductRepository.FindProducts()
 
-	for i, p := range products {
-		products[i].Image = path_file + p.Image
-	}
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
@@ -38,7 +43,10 @@ func (h *handlerProduct) FindProducts(c echo.Context) error {
 
 func (h *handlerProduct) CreateProduct(c echo.Context) error {
 
-	dataFile := c.Get("dataFile").(string)
+	fmt.Println(CLOUD_NAME)
+	fmt.Println(API_KEY)
+	fmt.Println(CLOUD_NAME)
+	filepath := c.Get("dataFile").(string)
 
 	userLogin := c.Get("userLogin")
 	userId := userLogin.(jwt.MapClaims)["id"].(float64)
@@ -49,7 +57,7 @@ func (h *handlerProduct) CreateProduct(c echo.Context) error {
 		Desc:   c.FormValue("desc"),
 		Price:  price,
 		Stock:  qty,
-		Image:  dataFile,
+		Image:  filepath,
 		UserID: int(userId),
 	}
 
@@ -59,13 +67,20 @@ func (h *handlerProduct) CreateProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans"})
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println("image" + resp.SecureURL)
 	// Query setup
 	product := models.Product{
 		Name:   request.Name,
 		Desc:   request.Desc,
 		Price:  request.Price,
 		Stock:  request.Stock,
-		Image:  request.Image,
+		Image:  resp.SecureURL,
 		UserID: request.UserID,
 	}
 	product, err = h.ProductRepository.CreateProduct(product)
@@ -89,10 +104,9 @@ func (h *handlerProduct) CreateProduct(c echo.Context) error {
 func (h *handlerProduct) GetProduct(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	var path_file = "http://localhost:5000/uploads/"
 	var product models.Product
 	product, err := h.ProductRepository.GetProduct(id)
-	product.Image = path_file + product.Image
+
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
@@ -109,13 +123,20 @@ func (h *handlerProduct) UpdateProduct(c echo.Context) error {
 	// geting id from params
 	price, _ := strconv.Atoi(c.FormValue("price"))
 	qty, _ := strconv.Atoi(c.FormValue("stock"))
-	Img := c.Get("dataFile").(string)
+	filepath := c.Get("dataFile").(string)
 	request := productdto.UpdateProductRequest{
 		Name:  c.FormValue("name"),
 		Desc:  c.FormValue("desc"),
 		Price: price,
 		Stock: qty,
-		Image: Img,
+		Image: filepath,
+	}
+
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "Waysbeans"})
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 
 	if request.Name != "" {
@@ -134,7 +155,7 @@ func (h *handlerProduct) UpdateProduct(c echo.Context) error {
 	}
 
 	if request.Image != "" {
-		product.Image = request.Image
+		product.Image = resp.SecureURL
 	}
 
 	data, err := h.ProductRepository.UpdateProduct(product)
