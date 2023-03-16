@@ -18,11 +18,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var ctx = context.Background()
-var CLOUD_NAME = os.Getenv("CLOUD_NAME")
-var API_KEY = os.Getenv("API_KEY")
-var API_SECRET = os.Getenv("API_SECRET")
-
 type handlerProduct struct {
 	ProductRepository repositories.ProductRepository
 }
@@ -42,6 +37,7 @@ func (h *handlerProduct) FindProducts(c echo.Context) error {
 }
 
 func (h *handlerProduct) CreateProduct(c echo.Context) error {
+
 	filepath := c.Get("dataFile").(string)
 
 	userLogin := c.Get("userLogin")
@@ -62,7 +58,10 @@ func (h *handlerProduct) CreateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
-
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
 	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
 
 	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans"})
@@ -127,7 +126,10 @@ func (h *handlerProduct) UpdateProduct(c echo.Context) error {
 		Stock: qty,
 		Image: filepath,
 	}
-
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
 	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
 
 	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans"})
