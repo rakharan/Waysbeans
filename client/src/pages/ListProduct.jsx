@@ -26,7 +26,7 @@ const ListProduct = () => {
 
   async function handleDelete(id) {
     await API.delete("/product/" + id);
-    const imgID = await cloudinary.uploader.destroy();
+
     refetch();
   }
 
