@@ -18,15 +18,8 @@ const ListProduct = () => {
     return response.data.data;
   });
 
-  const { data: product } = useQuery("singleProduct", async () => {
-    const response = await API.get("/product/11");
-    return response.data.data;
-  });
-  console.log(product);
-
   async function handleDelete(id) {
     await API.delete("/product/" + id);
-
     refetch();
   }
 

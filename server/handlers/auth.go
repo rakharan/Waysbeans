@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 	authdto "waysbeanapi/dto/auth"
 	dto "waysbeanapi/dto/result"
@@ -12,6 +15,8 @@ import (
 	jwtToken "waysbeanapi/pkg/jwt"
 	"waysbeanapi/repositories"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -27,12 +32,12 @@ func HandlerAuth(AuthRepository repositories.AuthRepository) *handlerAuth {
 
 func (h *handlerAuth) Register(c echo.Context) error {
 
-	dataFile := c.Get("dataFile").(string)
+	filepath := c.Get("dataFile").(string)
 	request := authdto.AuthRequest{
 		Name:     c.FormValue("name"),
 		Email:    c.FormValue("email"),
 		Password: c.FormValue("password"),
-		Image:    dataFile,
+		Image:    filepath,
 		Role:     c.FormValue("role"),
 	}
 
@@ -46,14 +51,24 @@ func (h *handlerAuth) Register(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans/Profile"})
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 	user := models.User{
-
-		Name:     request.Name,
-		Email:    request.Email,
-		Password: password,
-		Role:     request.Role,
-		Image:    request.Image,
+		Name:          request.Name,
+		Email:         request.Email,
+		Password:      password,
+		Role:          request.Role,
+		Image:         resp.SecureURL,
+		ImagePublicID: resp.PublicID,
 	}
 
 	data, err := h.AuthRepository.Register(user)

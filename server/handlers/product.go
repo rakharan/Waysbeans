@@ -64,12 +64,10 @@ func (h *handlerProduct) CreateProduct(c echo.Context) error {
 	var API_SECRET = os.Getenv("API_SECRET")
 	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
 
-	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans"})
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans/Products"})
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println(resp.PublicID)
-	fmt.Println("image" + resp.SecureURL)
 	// Query setup
 	product := models.Product{
 		Name:          request.Name,

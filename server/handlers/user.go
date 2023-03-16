@@ -26,9 +26,6 @@ func (h *handler) FindUsers(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
-	if len(users) == 0 {
-		return c.JSON(http.StatusNotFound, dto.SuccessResult{Status: "No Users Found", Data: users})
-	}
 	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "Success", Data: users})
 }
 func (h *handler) CreateUser(c echo.Context) error {

@@ -214,10 +214,7 @@ const Cart = () => {
                       >
                         <div className="flex items-center py-4">
                           <img
-                            src={
-                              `http://localhost:5000/uploads/` +
-                              data.product.image
-                            }
+                            src={data.product.image}
                             alt="kopi"
                             width="80px"
                           />
