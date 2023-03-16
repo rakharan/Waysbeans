@@ -108,7 +108,7 @@ func (h *handlerProduct) GetProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "Success", Data: convertResponseProduct(product)})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "Success", Data: product})
 }
 
 func (h *handlerProduct) UpdateProduct(c echo.Context) error {
