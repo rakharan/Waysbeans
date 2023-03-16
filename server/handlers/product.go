@@ -168,20 +168,21 @@ func (h *handlerProduct) UpdateProduct(c echo.Context) error {
 
 func (h *handlerProduct) DeleteProduct(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-
 	product, err := h.ProductRepository.GetProduct(id)
-
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
-	var path_file = "uploads/"
-	// Delete image file
-	err = os.Remove(path_file + product.Image)
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+	resp, err := cld.Upload.Destroy(ctx, uploader.DestroyParams{PublicID: product.ImagePublicID})
+	fmt.Println(resp)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 	data, err := h.ProductRepository.DeleteProduct(product)
-
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
