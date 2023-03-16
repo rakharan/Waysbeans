@@ -132,7 +132,7 @@ func (h *handlerProduct) UpdateProduct(c echo.Context) error {
 	var API_SECRET = os.Getenv("API_SECRET")
 	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
 	cld.Upload.Destroy(ctx, uploader.DestroyParams{PublicID: product.ImagePublicID})
-	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans"})
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans/Products"})
 	if err != nil {
 		fmt.Println(err.Error())
 	}

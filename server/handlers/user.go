@@ -1,14 +1,18 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	dto "waysbeanapi/dto/result"
 	usersdto "waysbeanapi/dto/users"
 	"waysbeanapi/models"
 	"waysbeanapi/repositories"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/labstack/echo/v4"
 )
 
@@ -52,8 +56,6 @@ func (h *handler) CreateUser(c echo.Context) error {
 func (h *handler) GetUser(c echo.Context) error {
 	UserID, _ := strconv.Atoi(c.Param("id"))
 	user, err := h.UserRepository.GetUser(UserID)
-	var path_file = "http://localhost:5000/uploads/"
-	user.Image = path_file + user.Image
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusOK, Message: err.Error()})
 	}
@@ -68,12 +70,23 @@ func (h *handler) UpdateUser(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
-	Img := c.Get("dataFile").(string)
+	filepath := c.Get("dataFile").(string)
 	request := usersdto.UpdateUserRequest{
 		Name:     c.FormValue("name"),
 		Password: c.FormValue("password"),
 		Email:    c.FormValue("email"),
-		Image:    Img,
+		Image:    filepath,
+	}
+
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+	cld.Upload.Destroy(ctx, uploader.DestroyParams{PublicID: user.ImagePublicID})
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbeans/Profile"})
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 
 	if request.Name != "" {
@@ -88,7 +101,7 @@ func (h *handler) UpdateUser(c echo.Context) error {
 		user.Password = request.Password
 	}
 	if request.Image != "" {
-		user.Image = request.Image
+		user.Image = resp.SecureURL
 	}
 
 	data, err := h.UserRepository.UpdateUser(user)
@@ -106,6 +119,17 @@ func (h *handler) DeleteUser(c echo.Context) error {
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
+	}
+
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+	resp, err := cld.Upload.Destroy(ctx, uploader.DestroyParams{PublicID: user.ImagePublicID})
+	fmt.Println(resp)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
 	data, err := h.UserRepository.DeleteUser(user, id)

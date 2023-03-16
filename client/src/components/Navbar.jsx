@@ -30,6 +30,9 @@ const Navbar = () => {
     return response.data.data;
   });
 
+  console.log(profile);
+  console.log(state.user.id);
+
   return (
     <>
       <div className="navbar h-20 bg-[#F5F5F5]  flex justify-between items-center px-[100px] shadow-navbarShadow">
