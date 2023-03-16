@@ -6,6 +6,8 @@ import { API } from "../config/api";
 import { UserContext } from "../context/UserContext";
 import { GlobalContext } from "../context/GlobalContext";
 import Button from "../parts/Button";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 const DetailProduct = () => {
   document.title = "Waysbeans | Product Detail";
   const params = useParams();
@@ -102,7 +104,12 @@ const DetailProduct = () => {
     >
       <div className="productDetail flex justify-center items-center w-[1035px] gap-x-40">
         <div className="productImage h-[555px]">
-          <img src={DetailProduct?.image} alt="" className="max-h-[555px]" />
+          <LazyLoadImage
+            effect="blur"
+            src={DetailProduct?.image}
+            alt=""
+            className="max-h-[555px]"
+          />
         </div>
         <div className="productDescription text-[#613D2B] max-w-[544px] flex flex-col gap-y-2">
           <h1 className=" font-black text-[48px] leading-[65.57px] mb-[3px]">

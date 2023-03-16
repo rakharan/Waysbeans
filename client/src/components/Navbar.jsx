@@ -1,10 +1,12 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Button from "../parts/Button";
 import { GlobalContext } from "../context/GlobalContext";
 import { UserContext } from "../context/UserContext";
 import { useQuery } from "react-query";
 import { API } from "../config/api";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 const Navbar = () => {
   const navigate = useNavigate();
   const [state, dispatch] = useContext(UserContext);
@@ -20,28 +22,39 @@ const Navbar = () => {
     });
     navigate("/");
   };
-  const { data: carts, refetch } = useQuery("cartCaches", async () => {
-    const response = await API.get("/user/cart/");
-    return response.data.data;
-  });
+  const { data: carts, refetch } = useQuery(
+    "cartCaches",
+    async () => {
+      const response = await API.get("/user/cart/");
+      return response.data.data;
+    },
+    {
+      refetchInterval: 200,
+    }
+  );
 
-  let { data: profile } = useQuery("ProfileCache", async () => {
-    const response = await API.get("/user/" + state.user.id);
-    return response.data.data;
-  });
-
-  console.log(profile);
-  console.log(state.user.id);
+  let { data: profile } = useQuery(
+    "ProfileCache",
+    async () => {
+      const response = await API.get("/user/" + state.user.id);
+      return response.data.data;
+    },
+    {
+      refetchInterval: 200,
+    }
+  );
 
   return (
     <>
       <div className="navbar h-20 bg-[#F5F5F5]  flex justify-between items-center px-[100px] shadow-navbarShadow">
         <div className="navbarLogo">
           <NavLink to="/">
-            <img
-              className="w-[163px]"
+            <LazyLoadImage
+              width={163}
+              height={`100%`}
               src="/waysbean.png"
               alt="logo waysbean"
+              effect="blur"
             />
           </NavLink>
         </div>
@@ -77,16 +90,19 @@ const Navbar = () => {
                 }}
               >
                 <NavLink to="/profile" className="profile relative">
-                  <img
+                  <LazyLoadImage
+                    effect="blur"
+                    width={50}
+                    height={50}
                     src={profile?.image}
-                    alt="hahah"
+                    alt="profilePic"
                     className=" object-cover h-[50px] w-[50px]"
                   />
                 </NavLink>
                 {/* user dropdown */}
-                {isProfileHovered ? (
+                {isProfileHovered && state.user.role === "user" ? (
                   <>
-                    <ul className="absolute top-[60px] bg-white text-black w-60 right-0 rounded-[10px]">
+                    <ul className="absolute top-[60px] bg-white text-black w-60 right-0 rounded-[10px] z-50">
                       <NavLink to="/profile" className="addProduct">
                         <li className="p-4 flex gap-x-4">
                           <div className="w-[24px]">
@@ -141,11 +157,11 @@ const Navbar = () => {
                 {/* admin dropdown */}
                 {state.user.role === "admin" && isProfileHovered ? (
                   <>
-                    <ul className="absolute top-[60px] bg-white text-black w-60 right-0 rounded-[10px]">
+                    <ul className="absolute top-[60px] bg-white text-black w-60 right-0 rounded-[10px] z-50">
                       <NavLink to="/admin/addProduct" className="addProduct">
                         <li className="p-4 flex gap-x-4">
                           <div className="w-[24px]">
-                            <img src="/coffeeIcon.svg" alt="" />
+                            <LazyLoadImage src="/coffeeIcon.svg" alt="" />
                           </div>
                           Add Product
                         </li>
@@ -153,7 +169,7 @@ const Navbar = () => {
                       <NavLink to="/admin/listProduct" className="listProduct">
                         <li className="p-4 flex gap-x-4 border-t-[2px]">
                           <div className="w-[24px]">
-                            <img src="/coffeeIcon.svg" alt="" />
+                            <LazyLoadImage src="/coffeeIcon.svg" alt="" />
                           </div>
                           List Product
                         </li>

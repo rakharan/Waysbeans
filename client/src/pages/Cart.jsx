@@ -9,25 +9,29 @@ import Modal from "../components/Modal/Modal";
 const Cart = () => {
   document.title = "Waysbeans | Cart";
   const { functionHandlers } = useContext(GlobalContext);
-  const { price, decrementQuantityHandler } = functionHandlers;
+  const { price } = functionHandlers;
 
   const [popUpForm, setPopUpForm] = useState(false);
 
   const [state] = useContext(UserContext);
   // get cart data
-  const { data: carts, refetch } = useQuery("cartCache", async () => {
-    const response = await API.get("/user/cart/");
-    return response.data.data;
-  });
+  const { data: carts, refetch } = useQuery(
+    "cartCache",
+    async () => {
+      const response = await API.get("/user/cart/");
+      return response.data.data;
+    },
+    { refetchInterval: 200 }
+  );
   // get current user
-  const { data: profile } = useQuery("profileCache", async () => {
+  const { data: profile } = useQuery("ProfileCache", async () => {
     const response = await API.get("/user/" + state.user.id);
     return response.data.data;
   });
 
   let total = 0;
   let quantity = 0;
-  if (!!carts !== false) {
+  if (carts !== false) {
     carts?.forEach((e) => {
       total += e.subtotal;
       quantity += e.orderQuantity;
@@ -111,12 +115,7 @@ const Cart = () => {
       });
     } catch (error) {
       // set popup when response failed
-      setShow(true);
-      setTitle("Payment Failed, Try Again Later");
-      setAlert("#DC3545");
-      setTimeout(() => {
-        setShow(false);
-      }, 2000);
+      alert(error);
     }
   });
 
@@ -219,24 +218,11 @@ const Cart = () => {
                             width="80px"
                           />
                           <div className="productOperator ml-[13px] flex flex-col gap-y-4">
-                            <h1>{data?.product.name}</h1>
+                            <h1>{data?.product.name.toUpperCase()}</h1>
                             <p className="flex gap-x-4 items-center">
-                              <span
-                                className="cursor-pointer"
-                                onClick={() => {
-                                  decrementQuantityHandler(data, index);
-                                }}
-                              >
-                                -
-                              </span>
+                              Order Quantity:
                               <span className="bg-sky-300 p-2">
                                 {data.orderQuantity}
-                              </span>
-                              <span
-                                className="cursor-pointer"
-                                // onClick={incrementQuantityHandler}
-                              >
-                                +
                               </span>
                             </p>
                           </div>

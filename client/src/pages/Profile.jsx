@@ -1,21 +1,46 @@
-import React, { useContext, useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
 import { API } from "../config/api";
 import { UserContext } from "../context/UserContext";
 import Modal from "../components/Modal/Modal";
 import Button from "../parts/Button";
 import { GlobalContext } from "../context/GlobalContext";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 const Profile = () => {
   document.title = "Waysbeans | Profile";
   const [state] = useContext(UserContext);
-  const { statesFromGlobalContext } = useContext(GlobalContext);
+  const navigate = useNavigate();
+  const { statesFromGlobalContext, functionHandlers } =
+    useContext(GlobalContext);
   const { preview, setPreview } = statesFromGlobalContext;
-  let { data: profile } = useQuery("ProfileCache", async () => {
-    const response = await API.get("/user/" + state.user.id);
-    return response.data.data;
-  });
+  const { price } = functionHandlers;
+  let { data: profile } = useQuery(
+    "ProfileCache",
+    async () => {
+      const response = await API.get("/user/" + state.user.id);
+      return response.data.data;
+    },
+    { refetchInterval: 200 }
+  );
+  const [transactionDetail, setTransactionDetail] = useState([]);
+  const { data: userTransaction, refetch } = useQuery(
+    "userTransactionCache",
+    async () => {
+      const response = await API.get("/user/transaction");
+      return response.data.data;
+    }
+  );
 
+  useEffect(() => {
+    refetch();
+  }, [userTransaction]);
+
+  const [showDetailTx, setShowDetailTx] = useState(false);
+  const handleClose = () => {
+    setShowDetailTx(false);
+  };
   const [profileInput, setProfileInput] = useState({
     name: "",
     password: "",
@@ -36,7 +61,6 @@ const Profile = () => {
   const [profileModal, setProfileModal] = useState(false);
   const handleUpdateProfile = useMutation(async (event) => {
     event.preventDefault();
-    console.log(profileInput);
     const config = {
       headers: {
         "Content-type": "multipart/form-data",
@@ -52,7 +76,6 @@ const Profile = () => {
       formData,
       config
     );
-    console.log(response);
     Swal.fire({
       title: "Profile Updated",
       icon: "success",
@@ -71,11 +94,106 @@ const Profile = () => {
     setProfileInput({ name: "", email: "", image: "", password: "" });
   });
 
+  const filterTx = (txID) => {
+    const filtered = userTransaction.filter((e) => e.id === txID);
+    setTransactionDetail(filtered);
+  };
   const hideModal = () => {
     setProfileModal(false);
   };
   return (
     <>
+      <>
+        {showDetailTx && (
+          <>
+            <Modal
+              onClick={() => {
+                handleClose();
+              }}
+            >
+              <div
+                className={`fixed top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white rounded-lg transition-all duration-300 ${
+                  showDetailTx ? `opacity-100` : `opacity-0`
+                }`}
+              >
+                <div className="w-[600px] p-4">
+                  <div className="border-b-2 flex justify-between">
+                    <h1 className=" font-bold">Transaction Detail</h1>
+                    <span
+                      className="font-bold text-xl cursor-pointer"
+                      onClick={() => {
+                        handleClose();
+                      }}
+                    >
+                      X
+                    </span>
+                  </div>
+                  <div className="flex flex-col justify-between w-full">
+                    <h1 className="my-5 text-md">
+                      List of Products inside transaction id:{" "}
+                      <span className="font-bold">
+                        #{transactionDetail[0].id}
+                      </span>
+                    </h1>
+                    <div className="leftContent">
+                      <div className="flex flex-col gap-y-4">
+                        {transactionDetail?.map((data) => {
+                          return data?.cart.map((cart, index) => {
+                            return (
+                              <div
+                                key={index}
+                                className="flex items-center gap-x-5 border p-2 rounded-lg w-full justify-between"
+                              >
+                                <div className="leftContent flex  items-center gap-x-4">
+                                  <div className="imageContainer w-[100px] h-[100px] flex overflow-hidden rounded-lg">
+                                    <LazyLoadImage
+                                      effect="blur"
+                                      src={cart.product.image}
+                                      alt="product image"
+                                      className=" object-cover"
+                                    />
+                                  </div>
+                                  <div className="detailContainer">
+                                    <h1>{cart.product.name}</h1>
+                                    <p className="opacity-40">
+                                      {cart.orderQuantity} x{" "}
+                                      {price.format(cart.product.price)}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="rightContent flex flex-col gap-y-2 border-l-2 pl-36">
+                                  <div className="">
+                                    <h3 className="text-sm">Total Harga</h3>
+                                    <span className="font-bold text-sm">
+                                      {price.format(
+                                        cart.product.price * cart.orderQuantity
+                                      )}
+                                    </span>
+                                  </div>
+                                  <Button
+                                    className="text-[#03AC0E] font-semibold border-[#03AC0E] hover:bg-[#03AC0E] hover:text-white"
+                                    onClick={() => {
+                                      navigate(
+                                        "/product-detail/" + cart.product.id
+                                      );
+                                    }}
+                                  >
+                                    Buy Again
+                                  </Button>
+                                </div>
+                              </div>
+                            );
+                          });
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Modal>
+          </>
+        )}
+      </>
       <>
         {profileModal && (
           <Modal onClick={hideModal}>
@@ -89,7 +207,7 @@ const Profile = () => {
                 <div>
                   {preview && (
                     <div className="flex justify-center items-center">
-                      <img
+                      <LazyLoadImage
                         src={preview}
                         style={{
                           maxWidth: "150px",
@@ -142,7 +260,8 @@ const Profile = () => {
           <h1 className="font-black text-lg text-[#613D2B] mb-4">My Profile</h1>
           <div className="flex gap-x-4">
             <div className="profileImage min-w-[180px] rounded-lg overflow-hidden">
-              <img
+              <LazyLoadImage
+                effect="blur"
                 src={profile?.image}
                 className="max-w-[180px]"
                 alt="profileImage"
@@ -201,18 +320,98 @@ const Profile = () => {
             <></>
           )}
         </div>
-        <div className="rightCard">
-          <div>
-            <h1 className="font-bold text-lg text-[#613D2B] mb-4">
-              My Transaction
-            </h1>
-            <div className="transctionContainer">
-              <div className="flex flex-col gap-y-3">
-                No transaction to be shown
+        {state.user.role === "user" ? (
+          <>
+            {" "}
+            <div className="rightCard">
+              <div>
+                <h1 className="font-bold text-lg text-[#613D2B] mb-4">
+                  My Transaction
+                </h1>
+                <div className="transctionContainer">
+                  <div className="flex flex-col gap-y-3">
+                    {userTransaction?.map((data, index) => {
+                      const totalOrderQuantity = data.cart.reduce(
+                        (acc, item) => acc + item.orderQuantity,
+                        0
+                      );
+                      const dateStr = data.update_at;
+                      const dateObj = new Date(dateStr);
+                      const formattedDate = dateObj.toDateString("en-US");
+                      return (
+                        <>
+                          <div className="gap-y-4 flex flex-col" key={index}>
+                            <div className="p-4 bg-[#F6E6DA] flex justify-between items-center w-[530px] text-[#613D2B]">
+                              <div className="leftCard flex gap-x-4">
+                                <div className="w-20">
+                                  <LazyLoadImage
+                                    effect="blur"
+                                    src={data.cart[0].product.image}
+                                    alt=""
+                                  />
+                                </div>
+                                <div className="productDetail text-xs flex flex-col gap-y-1 justify-between">
+                                  <p>
+                                    <span className="font-bold">
+                                      {formattedDate}
+                                    </span>
+                                  </p>
+                                  <p>Qty: {totalOrderQuantity}</p>
+                                  <p>Sub Total: {price.format(data.total)}</p>
+                                  <h1
+                                    className="text-[#03AC0E] font-bold cursor-pointer"
+                                    onClick={() => {
+                                      setShowDetailTx(true), filterTx(data.id);
+                                    }}
+                                  >
+                                    Transaction Detail
+                                  </h1>
+                                </div>
+                              </div>
+                              <div className="rightCard">
+                                <div className="flex flex-col gap-y-2 items-center bg-gradient-to-b">
+                                  <LazyLoadImage
+                                    effect="blur"
+                                    width="73px"
+                                    src="/waysbean.png"
+                                    alt="waysbeans logo"
+                                  />
+                                  <LazyLoadImage
+                                    effect="blur"
+                                    width="50px"
+                                    src="/qrCode.png"
+                                    alt=""
+                                  />
+                                  <div
+                                    className={`w-[112px] text-center rounded-[2px] text-white ${
+                                      data.status == `success`
+                                        ? `bg-[#00ff1a]/60`
+                                        : data.status == `failed`
+                                        ? `bg-[#FF9900]/60`
+                                        : data.status == `pending`
+                                        ? `bg-[#FF9900]/60`
+                                        : `bg-blue-500`
+                                    }`}
+                                  >
+                                    <p className="text-xs py-1 ">
+                                      {data.status.toUpperCase()}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </>
+        ) : (
+          <></>
+        )}
       </div>
     </>
   );

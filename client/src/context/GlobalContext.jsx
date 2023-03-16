@@ -73,13 +73,10 @@ export const GlobalProvider = (props) => {
   // Functions for product
   const handleEdit = (event) => {
     let idData = parseInt(event.currentTarget.value);
-    console.log(idData);
     navigate(`/admin/edit-product/${idData}`);
     const currentProduct = productData.filter(
       (product) => product.id === idData
     );
-    console.log(currentProduct);
-    console.log(productData);
     setProductInput({
       id: currentProduct[0].id,
       name: currentProduct[0].name,

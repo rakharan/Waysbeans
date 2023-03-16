@@ -15,6 +15,7 @@ import EditProduct from "./pages/EditProduct";
 import { UserContext } from "./context/UserContext";
 import { API, setAuthToken } from "./config/api";
 import NotFound from "./components/NotFound";
+import ServerError from "./pages/ServerError";
 if (localStorage.token) {
   setAuthToken(localStorage.token);
 }
@@ -27,6 +28,12 @@ const App = () => {
     if (state.isLogin === false && !isLoading) {
       navigate("/");
     }
+    if (state.user.role === "admin") {
+      navigate("/admin");
+    }
+    if (state.user.role === "user") {
+      navigate("/");
+    }
     // else {
     //   if (state.user.role === "admin") {
     //     navigate("/admin");
@@ -35,7 +42,7 @@ const App = () => {
     //   }
     // }
     setAuthToken(localStorage.token);
-  }, [state]);
+  }, []);
 
   async function checkAuth() {
     try {
@@ -61,8 +68,10 @@ const App = () => {
         return (
           dispatch({ type: "AUTH_ERROR" }),
           setTimeout(() => {
-            setIsLoading(true);
-          }, 3000)
+            setIsLoading(false);
+          }, 3000),
+          alert("server is under maintenance"),
+          navigate("/server-error")
         );
       }
       // check error auth response if from client side
@@ -104,7 +113,7 @@ const App = () => {
 
   return (
     <>
-      {/* {t? (
+      {isLoading ? (
         <>
           <div className="min-h-screen flex justify-center items-center loadingScreen">
             <div>
@@ -112,29 +121,33 @@ const App = () => {
             </div>
           </div>
         </>
-      ) : ( */}
-      <>
-        <Routes>
-          <Route path="/" element={<SharedLayout />}>
-            <Route index element={<Home />} />
-            <Route path="/product-detail/:id" element={<DetailProduct />} />
-            <Route path="/signUp" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<PrivateRoute />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/cart" element={<Cart />} />
+      ) : (
+        <>
+          <Routes>
+            <Route path="/" element={<SharedLayout />}>
+              <Route index element={<Home />} />
+              <Route path="/product-detail/:id" element={<DetailProduct />} />
+              <Route path="/signUp" element={<SignUp />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<PrivateRoute />}>
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/cart" element={<Cart />} />
+              </Route>
+              <Route path="/" element={<PrivateRouteAdmin />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/addProduct" element={<AddProduct />} />
+                <Route path="/admin/listProduct" element={<ListProduct />} />
+                <Route
+                  path="/admin/edit-product/:id"
+                  element={<EditProduct />}
+                />
+              </Route>
+              <Route path="*" element={<NotFound />} />
             </Route>
-            <Route path="/" element={<PrivateRouteAdmin />}>
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/addProduct" element={<AddProduct />} />
-              <Route path="/admin/listProduct" element={<ListProduct />} />
-              <Route path="/admin/edit-product/:id" element={<EditProduct />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </>
-      {/* )} */}
+            <Route path="/server-error" element={<ServerError />} />
+          </Routes>
+        </>
+      )}
     </>
   );
 };

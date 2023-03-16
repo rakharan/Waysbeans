@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 const ProductsCard = (props) => {
   return (
     <>
@@ -8,10 +9,13 @@ const ProductsCard = (props) => {
         <div className="productCard w-[241px] flex flex-col overflow-hidden h-[400px]  bg-[#F7E6DA] rounded-lg justify-between">
           <div className="w-[240px] h-[240px]">
             <NavLink to={`/product-detail/${props.id}`}>
-              <img
+              <LazyLoadImage
+                width={`100%`}
+                height={`100%`}
+                className="w-full h-full object-cover items-start"
                 src={props.source}
                 alt="produk"
-                className="w-full h-full object-cover items-start"
+                effect="blur"
               />
             </NavLink>
           </div>

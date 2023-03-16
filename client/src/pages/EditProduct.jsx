@@ -4,7 +4,8 @@ import Button from "../parts/Button";
 import { useMutation } from "react-query";
 import { API } from "../config/api";
 import { useNavigate } from "react-router-dom";
-
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 import Swal from "sweetalert2";
 const EditProduct = () => {
   document.title = "Waysbeans | Edit Product";
@@ -78,7 +79,8 @@ const EditProduct = () => {
               <div>
                 {preview && (
                   <div className="flex justify-center items-center">
-                    <img
+                    <LazyLoadImage
+                      effect="blur"
                       src={preview}
                       style={{
                         maxWidth: "150px",

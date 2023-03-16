@@ -7,6 +7,7 @@ import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 const Login = () => {
+  const navigate = useNavigate();
   const [isOnSignUp, setIsOnSignUp] = useState(false);
   const { functionHandlers, statesFromGlobalContext } =
     useContext(GlobalContext);
@@ -21,7 +22,6 @@ const Login = () => {
   } = statesFromGlobalContext;
   const { handleInput, handleInputRegister, handleRegister } = functionHandlers;
   const [state, dispatch] = useContext(UserContext);
-  const navigate = useNavigate();
 
   const handleLogin = useMutation(async (event) => {
     event.preventDefault();
@@ -55,6 +55,15 @@ const Login = () => {
     });
     setPreview(null);
     setIsModalVisible(false);
+    {
+      response.data.data.role === "admin" ? (
+        navigate("/admin")
+      ) : response.data.data.role === "user" ? (
+        navigate("/")
+      ) : (
+        <></>
+      );
+    }
   });
   return (
     <>

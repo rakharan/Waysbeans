@@ -11,8 +11,10 @@ const NotFound = () => {
         className="w-[400px] max-w-full object-cover"
       />
       <h1>Page under construction</h1>
-      <Button className="bg-primary text-white hover:bg-primary/80">
-        <Link to="/">Back to home</Link>
+      <Button className="bg-[#289d5e] text-white hover:bg-[#71CA9B]/80">
+        <Link to="/" className="text-xs">
+          Back to home
+        </Link>
       </Button>
     </div>
   );

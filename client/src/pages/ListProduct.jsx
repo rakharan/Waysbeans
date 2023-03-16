@@ -3,7 +3,8 @@ import { NavLink } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalContext";
 import { useQuery } from "react-query";
 import { API } from "../config/api";
-
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 import Swal from "sweetalert2";
 
 const ListProduct = () => {
@@ -61,7 +62,8 @@ const ListProduct = () => {
                   <th className="py-4 px-6">{index + 1}</th>
                   <td className="py-4 px-6">
                     <div>
-                      <img
+                      <LazyLoadImage
+                        effect="blur"
                         src={data.image}
                         style={{
                           maxWidth: "150px",
