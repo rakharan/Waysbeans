@@ -115,9 +115,8 @@ func (h *handlerTransaction) FindTransaction(c echo.Context) error {
 func (h *handlerTransaction) GetUserTransactionByUserID(c echo.Context) error {
 	userLogin := c.Get("userLogin")
 	userId := userLogin.(jwt.MapClaims)["id"].(float64)
-
 	// run repo get tsx by user id
-	transactions, err := h.TransactionRepository.GetTransactionByUserID(int(userId))
+	transactions, err := h.TransactionRepository.GetUserTransactionByUserID(int(userId))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
