@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalContext";
 import { useQuery } from "react-query";
@@ -10,7 +10,7 @@ const ListProduct = () => {
   document.title = "Waysbeans | List Products";
   const { statesFromGlobalContext, functionHandlers } =
     useContext(GlobalContext);
-  const { preview, setProductData } = statesFromGlobalContext;
+  const { preview } = statesFromGlobalContext;
   const { handleEdit } = functionHandlers;
 
   const { data: productList, refetch } = useQuery("ProductList", async () => {
@@ -18,12 +18,15 @@ const ListProduct = () => {
     return response.data.data;
   });
 
-  useEffect(() => {
-    setProductData(productList);
-  }, [productList]);
+  const { data: product } = useQuery("singleProduct", async () => {
+    const response = await API.get("/product/11");
+    return response.data.data;
+  });
+  console.log(product);
 
   async function handleDelete(id) {
     await API.delete("/product/" + id);
+    const imgID = await cloudinary.uploader.destroy();
     refetch();
   }
 

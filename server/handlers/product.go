@@ -68,15 +68,17 @@ func (h *handlerProduct) CreateProduct(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	fmt.Println(resp.PublicID)
 	fmt.Println("image" + resp.SecureURL)
 	// Query setup
 	product := models.Product{
-		Name:   request.Name,
-		Desc:   request.Desc,
-		Price:  request.Price,
-		Stock:  request.Stock,
-		Image:  resp.SecureURL,
-		UserID: request.UserID,
+		Name:          request.Name,
+		Desc:          request.Desc,
+		Price:         request.Price,
+		Stock:         request.Stock,
+		Image:         resp.SecureURL,
+		ImagePublicID: resp.PublicID,
+		UserID:        request.UserID,
 	}
 	product, err = h.ProductRepository.CreateProduct(product)
 	if err != nil {

@@ -18,7 +18,6 @@ const Home = () => {
     setIsLoginModal,
     isSignUpModal,
     setIsSignUpModal,
-    setProductData,
   } = statesFromGlobalContext;
   // Fetching product data from database
   let { data: products } = useQuery("productsCache", async () => {
@@ -26,9 +25,7 @@ const Home = () => {
     return response.data.data;
   });
 
-  useEffect(() => {
-    setProductData(products);
-  }, [products]);
+  console.log(products);
 
   const { price } = functionHandlers;
   const hideModalHandler = () => {
@@ -37,7 +34,6 @@ const Home = () => {
     setIsLoginModal(false);
     setPreview(null);
   };
-  console.log(products);
   return (
     <>
       {isModalVisible ? (

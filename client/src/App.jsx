@@ -104,7 +104,7 @@ const App = () => {
 
   return (
     <>
-      {isLoading ? (
+      {/* {t? (
         <>
           <div className="min-h-screen flex justify-center items-center loadingScreen">
             <div>
@@ -112,32 +112,29 @@ const App = () => {
             </div>
           </div>
         </>
-      ) : (
-        <>
-          <Routes>
-            <Route path="/" element={<SharedLayout />}>
-              <Route index element={<Home />} />
-              <Route path="/product-detail/:id" element={<DetailProduct />} />
-              <Route path="/signUp" element={<SignUp />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<PrivateRoute />}>
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/cart" element={<Cart />} />
-              </Route>
-              <Route path="/" element={<PrivateRouteAdmin />}>
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/addProduct" element={<AddProduct />} />
-                <Route path="/admin/listProduct" element={<ListProduct />} />
-                <Route
-                  path="/admin/edit-product/:id"
-                  element={<EditProduct />}
-                />
-              </Route>
-              <Route path="*" element={<NotFound />} />
+      ) : ( */}
+      <>
+        <Routes>
+          <Route path="/" element={<SharedLayout />}>
+            <Route index element={<Home />} />
+            <Route path="/product-detail/:id" element={<DetailProduct />} />
+            <Route path="/signUp" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<PrivateRoute />}>
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/cart" element={<Cart />} />
             </Route>
-          </Routes>
-        </>
-      )}
+            <Route path="/" element={<PrivateRouteAdmin />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/addProduct" element={<AddProduct />} />
+              <Route path="/admin/listProduct" element={<ListProduct />} />
+              <Route path="/admin/edit-product/:id" element={<EditProduct />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </>
+      {/* )} */}
     </>
   );
 };
