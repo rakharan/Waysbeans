@@ -6,7 +6,7 @@ const ProductsCard = (props) => {
   return (
     <>
       <div>
-        <div className="productCard w-[241px] flex flex-col overflow-hidden h-[400px]  bg-[#F7E6DA] rounded-lg justify-between">
+        <div className="productCard w-[241px] flex flex-col overflow-hidden h-[350px]  bg-[#F7E6DA] rounded-lg justify-between">
           <div className="w-[240px] h-[240px]">
             <NavLink to={`/product-detail/${props.id}`}>
               <LazyLoadImage
@@ -21,7 +21,7 @@ const ProductsCard = (props) => {
           </div>
           <div className="description flex flex-col  px-4">
             <h1 className="productTitle  mt-[14px] font-bold">
-              {props.productName} Beans
+              {props.productName}
             </h1>
             <span className="price mt-[11px]">{props.productPrice}</span>
             <span className="stock my-[5px]">Stock : {props.productStock}</span>

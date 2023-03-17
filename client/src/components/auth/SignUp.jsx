@@ -83,16 +83,14 @@ const SignUp = () => {
     });
   });
 
-  const config = {
-    headers: {
-      "Content-type": "multipart/form-data",
-    },
-  };
-
   const handleRegister = useMutation(async (e) => {
     try {
       e.preventDefault();
-
+      const config = {
+        headers: {
+          "Content-type": "multipart/form-data",
+        },
+      };
       const formData = new FormData();
 
       formData.set("image", input.image[0], input.image[0].name);

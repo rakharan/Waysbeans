@@ -20,7 +20,7 @@ const Login = () => {
     setPreview,
     preview,
   } = statesFromGlobalContext;
-  const { handleInput, handleInputRegister, handleRegister } = functionHandlers;
+  const { handleInput, handleInputRegister } = functionHandlers;
   const [state, dispatch] = useContext(UserContext);
 
   const handleLogin = useMutation(async (event) => {
@@ -64,6 +64,52 @@ const Login = () => {
         <></>
       );
     }
+  });
+  const handleRegister = useMutation(async (e) => {
+    try {
+      e.preventDefault();
+      const config = {
+        headers: {
+          "Content-type": "multipart/form-data",
+        },
+      };
+      const formData = new FormData();
+
+      formData.set("image", input.image[0], input.image[0].name);
+      formData.set("name", input.name);
+      formData.set("email", input.email);
+      formData.set("password", input.password);
+
+      await API.post("/register", formData, config);
+
+      Swal.fire({
+        title: "Register Success",
+        icon: "success",
+        timer: 1500,
+        width: 600,
+        padding: "3em",
+        color: "#c23a63",
+        background: "#fff)",
+        backdrop: `
+            rgba(0,0,123,0.4)
+            left top
+            no-repeat
+          `,
+      });
+      navigate("/");
+      setIsModalVisible(false);
+    } catch (error) {
+      alert("register failed : ", error);
+      return;
+    }
+
+    setInput({
+      name: "",
+      password: "",
+      email: "",
+      image: "",
+    });
+    setPreview(null);
   });
   return (
     <>
