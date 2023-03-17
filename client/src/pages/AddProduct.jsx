@@ -60,17 +60,32 @@ const AddProduct = () => {
 
   return (
     <>
-      <div className="flex justify-center my-24 gap-x-20">
-        <div className="leftContent flex flex-col text-center">
+      <div className="flex justify-center my-24 gap-x-20 items-center">
+        <div className="leftContent flex flex-col text-center justify-center">
           <h1>Add Product</h1>
-          <div className="form w-full flex justify-center">
+          <div className="form md:w-full flex justify-center w-[280px]">
             <form
               action=""
-              className="flex flex-col gap-y-5"
+              className="flex flex-col gap-y-5 w-[280px]"
               onSubmit={(e) => {
                 handleSubmitProduct.mutate(e);
               }}
             >
+              <div>
+                {preview && (
+                  <div className="flex justify-center items-center">
+                    <img
+                      src={preview}
+                      style={{
+                        maxWidth: "300px",
+                        maxHeight: "300px",
+                        objectFit: "cover",
+                      }}
+                      alt={preview}
+                    />
+                  </div>
+                )}
+              </div>
               <input
                 type="text"
                 name="name"
@@ -125,7 +140,7 @@ const AddProduct = () => {
             </form>
           </div>
         </div>
-        <div className="rightContent flex flex-col justify-center ">
+        {/* <div className="rightContent flex flex-col justify-center ">
           <div>
             <div>
               {preview && (
@@ -143,7 +158,7 @@ const AddProduct = () => {
               )}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );

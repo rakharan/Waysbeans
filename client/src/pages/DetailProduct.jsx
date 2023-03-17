@@ -102,23 +102,23 @@ const DetailProduct = () => {
       className="flex w-full justify-center items-center
     mt-[92px] mb-20"
     >
-      <div className="productDetail flex justify-center items-center w-[1035px] gap-x-40">
-        <div className="productImage h-[555px]">
+      <div className="productDetail flex justify-center items-center w-[1035px] gap-x-40 flex-col lg:flex-row">
+        <div className="productImage  flex w-[280px] lg:w-[450px] mb-4">
           <LazyLoadImage
             effect="blur"
             src={DetailProduct?.image}
-            alt=""
-            className="max-h-[555px]"
+            alt="product image"
+            className="rounded-xl"
           />
         </div>
-        <div className="productDescription text-[#613D2B] max-w-[544px] flex flex-col gap-y-2">
-          <h1 className=" font-black text-[48px] leading-[65.57px] mb-[3px]">
+        <div className="productDescription text-[#613D2B] w-[280px] flex flex-col gap-y-2">
+          <h1 className="text-xl font-black lg:text-[48px] lg:leading-[65.57px] mb-[3px]">
             {DetailProduct?.name.toUpperCase()}
           </h1>
           <span className=" font-normal text-sm leading-[24.59px] mb-[35px]">
             Stock : {DetailProduct?.stock}
           </span>
-          <p className="text-justify text-lg mb-[21px]">
+          <p className=" text-justify text-md mb-[21px]">
             {DetailProduct?.desc}
           </p>
           <div className="productPrice flex">

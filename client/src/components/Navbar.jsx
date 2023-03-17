@@ -19,8 +19,23 @@ const MobileNavbar = (props) => {
   let { data: profile } = useQuery(
     "ProfileCache",
     async () => {
-      const response = await API.get("/user/" + state.user.id);
-      return response.data.data;
+      if (state.isLogin) {
+        const response = await API.get("/user/" + state.user.id);
+        return response.data.data;
+      }
+    },
+    {
+      refetchInterval: 200,
+    }
+  );
+
+  const { data: carts } = useQuery(
+    "cartCaches",
+    async () => {
+      if (state.isLogin) {
+        const response = await API.get("/user/cart/");
+        return response.data.data;
+      }
     },
     {
       refetchInterval: 200,
@@ -47,16 +62,38 @@ const MobileNavbar = (props) => {
             <NavLink to="/profile" className="profile relative">
               <div className="flex items-center p-2 gap-x-4">
                 <LazyLoadImage
+                  width={25}
+                  height={25}
                   effect="blur"
                   src={profile?.image}
                   alt="profilePic"
-                  className=" object-cover h-[25px] w-[25px] rounded-full overflow-hidden"
+                  className=" object-cover h-[25px] w-[25px] rounded-full"
                 />
                 <span className="text-xs">
                   <span>{profile?.name}</span>
                 </span>
               </div>
             </NavLink>
+          </div>
+          <div>
+            <div className="flex items-center p-2 gap-x-4">
+              <NavLink to="/cart" className="cart  flex items-center gap-x-4">
+                <div className="relative">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-[25px] h-[25px] "
+                  >
+                    <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
+                  </svg>
+                  <span className="absolute inline-flex items-center justify-center w-3 h-3 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-[2px] -right-[2px] dark:border-gray-900">
+                    {carts?.length}
+                  </span>
+                </div>
+                <span className="text-xs">Cart</span>
+              </NavLink>
+            </div>
           </div>
           <div>
             <NavLink
@@ -168,8 +205,8 @@ const MobileNavbar = (props) => {
                 navigate("/login");
               }}
             >
-              <Button className=" w-[50px] h-[20px] flex justify-center items-center">
-                <span className="text-[8px] text-center flex">Login</span>
+              <Button className="flex justify-center items-center border-none font-semibold">
+                <span className="text-xs text-center flex">Login</span>
               </Button>
             </NavLink>
           </div>
@@ -181,8 +218,8 @@ const MobileNavbar = (props) => {
                 navigate("/signup");
               }}
             >
-              <Button className=" w-[50px] h-[20px] flex justify-center items-center">
-                <span className="text-[8px] text-center flex">Sign Up</span>
+              <Button className=" flex justify-center items-center border-none font-semibold">
+                <span className="text-xs text-center flex">Sign Up</span>
               </Button>
             </NavLink>
           </div>
@@ -210,8 +247,10 @@ const Navbar = (props) => {
   const { data: carts } = useQuery(
     "cartCaches",
     async () => {
-      const response = await API.get("/user/cart/");
-      return response.data.data;
+      if (state.isLogin) {
+        const response = await API.get("/user/cart/");
+        return response.data.data;
+      }
     },
     {
       refetchInterval: 200,
@@ -221,8 +260,10 @@ const Navbar = (props) => {
   let { data: profile } = useQuery(
     "ProfileCache",
     async () => {
-      const response = await API.get("/user/" + state.user.id);
-      return response.data.data;
+      if (state.isLogin) {
+        const response = await API.get("/user/" + state.user.id);
+        return response.data.data;
+      }
     },
     {
       refetchInterval: 200,
@@ -231,12 +272,12 @@ const Navbar = (props) => {
 
   return (
     <>
-      <div className="navbar h-20 bg-[#F5F5F5]  flex justify-between items-center shadow-navbarShadow px-4">
-        <div className=" flex justify-between w-full ">
+      <div className="navbar h-20 bg-[#F5F5F5]  flex justify-between items-center shadow-navbarShadow px-4 md:px-8 lg:px-20">
+        <div className=" flex justify-between w-full items-center">
           <div className="navbarLogo">
             <NavLink to="/">
               <LazyLoadImage
-                className="w-[100px]"
+                className="w-[100px] md:w-[150px]"
                 height={`100%`}
                 src="/waysbean.png"
                 alt="logo waysbean"
@@ -267,7 +308,7 @@ const Navbar = (props) => {
                   <></>
                 )}
                 <div
-                  className="w-full rounded-[50%] overflow-hidden "
+                  className="w-full "
                   onMouseEnter={() => {
                     setIsProfileHovered(true);
                   }}
@@ -282,7 +323,7 @@ const Navbar = (props) => {
                       height={50}
                       src={profile?.image}
                       alt="profilePic"
-                      className=" object-cover h-[50px] w-[50px]"
+                      className=" object-cover h-[50px] w-[50px] rounded-full"
                     />
                   </NavLink>
                   {/* user dropdown */}

@@ -196,9 +196,9 @@ const Cart = () => {
         )}
       </>
       <>
-        <div className="w-full flex justify-center items-center min-h-screen">
-          <div className="mainCartContent flex justify-around items-center gap-x-20">
-            <div className="leftCart w-[660px]">
+        <div className="w-full flex justify-center items-center min-h-screen px-4">
+          <div className="mainCartContent flex justify-around items-center gap-x-20 flex-col md:flex-row">
+            <div className="leftCart w-full md:w-[660px]">
               <h1 className="font-bold text-2xl">My Cart</h1>
               <div className="leftCartContent">
                 <p>Review Your Order</p>
@@ -217,19 +217,23 @@ const Cart = () => {
                             alt="kopi"
                             width="80px"
                           />
-                          <div className="productOperator ml-[13px] flex flex-col gap-y-4">
-                            <h1>{data?.product.name.toUpperCase()}</h1>
-                            <p className="flex gap-x-4 items-center">
+                          <div className="productOperator ml-[13px] flex flex-col gap-y-4 ">
+                            <h1 className="text-xs md:text-base">
+                              {data?.product.name.toUpperCase()}
+                            </h1>
+                            <span className="flex gap-x-4 items-center text-xs md:text-base">
                               Order Quantity:
                               <span className="bg-sky-300 p-2">
                                 {data.orderQuantity}
                               </span>
-                            </p>
+                            </span>
                           </div>
                         </div>
                         <div className="">
                           <div className="flex flex-col justify-center items-center gap-y-4">
-                            <p>Rp. {price.format(data.subtotal)}</p>
+                            <span className="text-xs md:text-base">
+                              Rp. {price.format(data.subtotal)}
+                            </span>
                             <button
                               value={data.id}
                               onClick={() => {
@@ -269,7 +273,7 @@ const Cart = () => {
                 )}
               </div>
             </div>
-            <div className="rightCart w-[350px] flex flex-col justify-end mt-20">
+            <div className="rightCart w-full md:w-[350px] flex flex-col justify-end mt-20">
               <div className="border-y-4  py-4 gap-y-4">
                 <h3 className="flex justify-between ">
                   Subtotal <span>{price.format(total)}</span>

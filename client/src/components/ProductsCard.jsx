@@ -6,8 +6,8 @@ const ProductsCard = (props) => {
   return (
     <>
       <div>
-        <div className="productCard w-[241px] flex flex-col overflow-hidden h-[350px]  bg-[#F7E6DA] rounded-lg justify-between">
-          <div className="w-[240px] h-[240px]">
+        <div className="productCard w-[120px] h-[165px] md:w-[240px] flex flex-col overflow-hidden md:h-[350px]  bg-[#F7E6DA] rounded-lg justify-between">
+          <div className="imageContainer w-[120px] h-[120px] md:w-[240px] md:h-[240px]">
             <NavLink to={`/product-detail/${props.id}`}>
               <LazyLoadImage
                 width={`100%`}
@@ -19,12 +19,16 @@ const ProductsCard = (props) => {
               />
             </NavLink>
           </div>
-          <div className="description flex flex-col  px-4">
-            <h1 className="productTitle  mt-[14px] font-bold">
+          <div className="description flex flex-col  px-4 mb-1">
+            <h1 className="productTitle lg:mt-[14px] font-bold text-[8px] md:text-base lg:text-lg">
               {props.productName}
             </h1>
-            <span className="price mt-[11px]">{props.productPrice}</span>
-            <span className="stock my-[5px]">Stock : {props.productStock}</span>
+            <span className="price lg:mt-[11px] text-[8px] md:text-base lg:text-lg">
+              {props.productPrice}
+            </span>
+            <span className="stock lg:my-[5px] md:text-base lg:text-lg text-[8px]">
+              Stock : {props.productStock}
+            </span>
           </div>
         </div>
       </div>

@@ -116,7 +116,7 @@ const Profile = () => {
                   showDetailTx ? `opacity-100` : `opacity-0`
                 }`}
               >
-                <div className="w-[600px] p-4">
+                <div className="w-full p-4">
                   <div className="border-b-2 flex justify-between">
                     <h1 className=" font-bold">Transaction Detail</h1>
                     <span
@@ -136,13 +136,13 @@ const Profile = () => {
                       </span>
                     </h1>
                     <div className="leftContent">
-                      <div className="flex flex-col gap-y-4">
+                      <div className="flex flex-col gap-y-4 ">
                         {transactionDetail?.map((data) => {
                           return data?.cart.map((cart, index) => {
                             return (
                               <div
                                 key={index}
-                                className="flex items-center gap-x-5 border p-2 rounded-lg w-full justify-between"
+                                className="flex justify-center items-center md:gap-x-5 border p-2 rounded-lg w-full md:justify-between flex-col md:flex-row"
                               >
                                 <div className="leftContent flex  items-center gap-x-4">
                                   <div className="imageContainer w-[100px] h-[100px] flex overflow-hidden rounded-lg">
@@ -161,8 +161,8 @@ const Profile = () => {
                                     </p>
                                   </div>
                                 </div>
-                                <div className="rightContent flex flex-col gap-y-2 border-l-2 pl-36">
-                                  <div className="">
+                                <div className="rightContent flex flex-col gap-y-2 md:border-l-2 md:pl-36 justify-center items-center w-full mt-5 md:mt-0">
+                                  <div className="flex flex-col">
                                     <h3 className="text-sm">Total Harga</h3>
                                     <span className="font-bold text-sm">
                                       {price.format(
@@ -197,7 +197,7 @@ const Profile = () => {
       <>
         {profileModal && (
           <Modal onClick={hideModal}>
-            <div className="flex flex-col">
+            <div className="flex flex-col w-[280px]">
               <form
                 className="flex flex-col p-4 gap-y-4"
                 onSubmit={(e) => {
@@ -255,15 +255,17 @@ const Profile = () => {
         )}
       </>
 
-      <div className="flex justify-between px-[200px] my-32">
+      <div className="flex justify-center my-32 flex-col px-2 md:flex-row md:gap-x-10">
         <div className="leftCard flex gap-x-4 flex-col">
-          <h1 className="font-black text-lg text-[#613D2B] mb-4">My Profile</h1>
-          <div className="flex gap-x-4">
+          <h1 className="font-black text-lg text-[#613D2B] mb-4 text-center md:text-left">
+            My Profile
+          </h1>
+          <div className="flex gap-x-4 flex-col justify-center w-full items-center mb-6 md:flex-row">
             <div className="profileImage min-w-[180px] rounded-lg overflow-hidden">
               <LazyLoadImage
                 effect="blur"
                 src={profile?.image}
-                className="max-w-[180px]"
+                className="max-w-[180px] rounded-lg"
                 alt="profileImage"
               />
             </div>
@@ -341,13 +343,14 @@ const Profile = () => {
                       return (
                         <>
                           <div className="gap-y-4 flex flex-col" key={index}>
-                            <div className="p-4 bg-[#F6E6DA] flex justify-between items-center w-[530px] text-[#613D2B]">
+                            <div className="p-4 bg-[#F6E6DA] flex justify-between items-center w-full md:w-[350px] lg:w-[530px] text-[#613D2B] rounded-xl">
                               <div className="leftCard flex gap-x-4">
                                 <div className="w-20">
                                   <LazyLoadImage
                                     effect="blur"
                                     src={data.cart[0].product.image}
-                                    alt=""
+                                    alt="product thumbnail"
+                                    className="rounded-lg"
                                   />
                                 </div>
                                 <div className="productDetail text-xs flex flex-col gap-y-1 justify-between">
