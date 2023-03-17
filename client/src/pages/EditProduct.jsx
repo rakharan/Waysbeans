@@ -128,6 +128,7 @@ const EditProduct = () => {
                 id="upload"
                 name="image"
                 onChange={handleEditInput}
+                value={productInput.image}
                 required
               />
               <Button className="mt-5 bg-[#613D2B] text-white w-full">

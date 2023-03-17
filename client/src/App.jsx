@@ -24,6 +24,20 @@ const App = () => {
   const [state, dispatch] = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Mobile Navbar Trigger on window resize
+  const [mobileNavbar, setMobileNavbar] = useState(false);
+  var ro = new ResizeObserver((entries) => {
+    for (let entry of entries) {
+      const cr = entry.contentRect;
+      if (cr.width >= 1024) {
+        setMobileNavbar(false);
+      }
+    }
+  });
+  const window = document.getElementById("root");
+  ro.observe(window);
+
+  // user redirect
   useEffect(() => {
     if (state.isLogin === false && !isLoading) {
       navigate("/");
@@ -34,16 +48,10 @@ const App = () => {
     if (state.user.role === "user") {
       navigate("/");
     }
-    // else {
-    //   if (state.user.role === "admin") {
-    //     navigate("/admin");
-    //   } else if (state.user.role === "user") {
-    //     navigate("/");
-    //   }
-    // }
     setAuthToken(localStorage.token);
   }, []);
 
+  // check auth/jwt availability
   async function checkAuth() {
     try {
       // get auth response
@@ -107,6 +115,7 @@ const App = () => {
     }
   }
 
+  // check auth on every refresh
   useEffect(() => {
     checkAuth();
   }, []);
@@ -124,7 +133,15 @@ const App = () => {
       ) : (
         <>
           <Routes>
-            <Route path="/" element={<SharedLayout />}>
+            <Route
+              path="/"
+              element={
+                <SharedLayout
+                  mobileNavbar={mobileNavbar}
+                  setMobileNavbar={setMobileNavbar}
+                />
+              }
+            >
               <Route index element={<Home />} />
               <Route path="/product-detail/:id" element={<DetailProduct />} />
               <Route path="/signUp" element={<SignUp />} />

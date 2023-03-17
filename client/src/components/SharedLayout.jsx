@@ -2,10 +2,13 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 
-const SharedLayout = () => {
+const SharedLayout = (props) => {
   return (
     <>
-      <Navbar />
+      <Navbar
+        mobileNavbar={props.mobileNavbar}
+        setMobileNavbar={props.setMobileNavbar}
+      />
       <Outlet />
     </>
   );
