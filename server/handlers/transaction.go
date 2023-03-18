@@ -183,7 +183,7 @@ func SendMail(status string, transaction models.Transaction) {
 
 		mailer := gomail.NewMessage()
 		mailer.SetHeader("From", CONFIG_SENDER_NAME)
-		mailer.SetHeader("To", transaction.User.Email)
+		mailer.SetHeader("To", transaction.Email)
 		mailer.SetHeader("Subject", "Transaction Status")
 		mailer.SetBody("text/html", fmt.Sprintf(`<!DOCTYPE html>
 	  <html lang="en">
@@ -220,6 +220,6 @@ func SendMail(status string, transaction models.Transaction) {
 			log.Fatal(err.Error())
 		}
 
-		log.Println("Mail sent! to " + transaction.User.Email)
+		log.Println("Mail sent! to " + transaction.Email)
 	}
 }
