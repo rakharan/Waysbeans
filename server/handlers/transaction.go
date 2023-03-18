@@ -175,8 +175,8 @@ func SendMail(status string, transaction models.Transaction) {
 		var CONFIG_SMTP_HOST = "smtp.gmail.com"
 		var CONFIG_SMTP_PORT = 587
 		var CONFIG_SENDER_NAME = "Waysbeans randhikatamar@gmail.com"
-		var CONFIG_AUTH_EMAIL = os.Getenv("EMAIL_SYSTEM")
-		var CONFIG_AUTH_PASSWORD = os.Getenv("PASSWORD_SYSTEM")
+		var CONFIG_AUTH_EMAIL = "randhikatamar@gmail.com"
+		var CONFIG_AUTH_PASSWORD = "ncjswmdxmiujouuc"
 
 		var productName = transaction.Cart
 		var price = strconv.Itoa(int(transaction.Total))
