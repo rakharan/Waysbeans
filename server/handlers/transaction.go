@@ -95,13 +95,13 @@ func (h *handlerTransaction) UpdateTransaction(c echo.Context) error {
 }
 
 func (h *handlerTransaction) FindTransaction(c echo.Context) error {
-	// userLogin := c.Get("userLogin")
-	// userRole := userLogin.(jwt.MapClaims)["role"]
+	userLogin := c.Get("userLogin")
+	userRole := userLogin.(jwt.MapClaims)["role"]
 
 	// check role admin
-	// if userRole != "admin" {
-	// 	return c.JSON(http.StatusUnauthorized, dto.ErrorResult{Code: http.StatusUnauthorized, Message: "You're not an admin"})
-	// }
+	if userRole != "admin" {
+		return c.JSON(http.StatusUnauthorized, dto.ErrorResult{Code: http.StatusUnauthorized, Message: "You're not an admin"})
+	}
 	// run repo find transaction
 	transaction, err := h.TransactionRepository.FindTransactions()
 	if err != nil {
@@ -136,38 +136,40 @@ func (h *handlerTransaction) Notification(c echo.Context) error {
 	fraudStatus := notificationPayload["fraud_status"].(string)
 	orderId := notificationPayload["order_id"].(string)
 
-	order_id, _ := strconv.Atoi(orderId)
-
-	fmt.Print("ini payloadnya", notificationPayload)
+	transaction, _ := h.TransactionRepository.GetTransactionMidtrans(orderId)
 
 	if transactionStatus == "capture" {
 		if fraudStatus == "challenge" {
 			// TODO set transaction status on your database to 'challenge'
 			// e.g: 'Payment status challenged. Please take action on your Merchant Administration Portal
-			h.TransactionRepository.UpdateTransactionMidtrans("pending", order_id)
+			h.TransactionRepository.UpdateTransactionMidtrans("pending", int(transaction.ID))
 		} else if fraudStatus == "accept" {
 			// TODO set transaction status on your database to 'success'
-			h.TransactionRepository.UpdateTransactionMidtrans("success", order_id)
+			SendMail("success", transaction)
+			h.TransactionRepository.UpdateTransactionMidtrans("success", int(transaction.ID))
 		}
 	} else if transactionStatus == "settlement" {
 		// TODO set transaction status on your databaase to 'success'
-		h.TransactionRepository.UpdateTransactionMidtrans("success", order_id)
+		SendMail("success", transaction)
+		h.TransactionRepository.UpdateTransactionMidtrans("success", int(transaction.ID))
 	} else if transactionStatus == "deny" {
 		// TODO you can ignore 'deny', because most of the time it allows payment retries
 		// and later can become success
-		h.TransactionRepository.UpdateTransactionMidtrans("failed", order_id)
+		SendMail("failed", transaction)
+		h.TransactionRepository.UpdateTransactionMidtrans("failed", int(transaction.ID))
 	} else if transactionStatus == "cancel" || transactionStatus == "expire" {
 		// TODO set transaction status on your databaase to 'failure'
-		h.TransactionRepository.UpdateTransactionMidtrans("failed", order_id)
+		SendMail("failed", transaction)
+		h.TransactionRepository.UpdateTransactionMidtrans("waiting", int(transaction.ID))
 	} else if transactionStatus == "pending" {
 		// TODO set transaction status on your databaase to 'pending' / waiting payment
-		h.TransactionRepository.UpdateTransactionMidtrans("pending", order_id)
+		h.TransactionRepository.UpdateTransactionMidtrans("waiting", int(transaction.ID))
 	}
 
 	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "Success", Data: notificationPayload})
 }
 
-func sendMail(status string, transaction models.Transaction) {
+func SendMail(status string, transaction models.Transaction) {
 	if status != transaction.Status && (status == "success") {
 		// GET VARIABLES FROM ENV
 		var CONFIG_SMTP_HOST = os.Getenv("HOST_SYSTEM")
