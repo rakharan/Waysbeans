@@ -95,13 +95,6 @@ func (h *handlerTransaction) UpdateTransaction(c echo.Context) error {
 }
 
 func (h *handlerTransaction) FindTransaction(c echo.Context) error {
-	userLogin := c.Get("userLogin")
-	userRole := userLogin.(jwt.MapClaims)["role"]
-
-	// check role admin
-	if userRole != "admin" {
-		return c.JSON(http.StatusUnauthorized, dto.ErrorResult{Code: http.StatusUnauthorized, Message: "You're not an admin"})
-	}
 	// run repo find transaction
 	transaction, err := h.TransactionRepository.FindTransactions()
 	if err != nil {
@@ -180,6 +173,7 @@ func SendMail(status string, transaction models.Transaction) {
 
 		var productName = transaction.Cart
 		var price = strconv.Itoa(int(transaction.Total))
+		fmt.Println(productName)
 
 		mailer := gomail.NewMessage()
 		mailer.SetHeader("From", CONFIG_SENDER_NAME)
