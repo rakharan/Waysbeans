@@ -32,7 +32,7 @@ $ go run main.go
 
 ## Usage
 
-To use the WaysBeans web application, you can visit the live website at https://waysbeans-teal.vercel.app/](https://waysbeans-teal.vercel.app/) or run it locally by following the installation instructions above.
+To use the WaysBeans web application, you can visit the live website at [https://waysbeans-teal.vercel.app/](https://waysbeans-teal.vercel.app/) or run it locally by following the installation instructions above.
 
 ## Contributing
 
