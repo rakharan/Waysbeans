@@ -103,10 +103,6 @@ export const GlobalProvider = (props) => {
       [event.target.name]:
         event.target.type === "file" ? event.target.files : event.target.value,
     });
-    if (event.target.type === "file") {
-      let url = URL.createObjectURL(event.target.files[0]);
-      setPreview(url);
-    }
   };
 
   let statesFromGlobalContext = {

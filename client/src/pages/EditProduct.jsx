@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { GlobalContext } from "../context/GlobalContext";
 import Button from "../parts/Button";
 import { useMutation } from "react-query";
@@ -15,6 +15,7 @@ const EditProduct = () => {
   const { productInput, setProductInput, preview, setPreview } =
     statesFromGlobalContext;
   const { handleEditInput } = functionHandlers;
+
   const handleSubmitProduct = useMutation(async (event) => {
     event.preventDefault();
     const config = {
@@ -23,17 +24,19 @@ const EditProduct = () => {
       },
     };
     const formData = new FormData();
-    formData.set("image", productInput.image[0], productInput.image[0].name);
     formData.set("name", productInput.name);
     formData.set("desc", productInput.desc);
     formData.set("price", productInput.price);
     formData.set("stock", productInput.stock);
+    formData.set("image", productInput.image);
+
     // new instance
     const response = await API.patch(
       "/product/" + productInput.id,
       formData,
       config
     );
+
     if (response.status === 200) {
       setPreview(null);
       navigate("/admin/listProduct");
@@ -60,10 +63,24 @@ const EditProduct = () => {
       });
     }
   });
+
+  const handleEditInputImage = (event) => {
+    let url = URL.createObjectURL(event.target.files[0]);
+    setProductInput({
+      ...productInput,
+      image: event.target.files[0],
+    });
+    setPreview(url);
+  };
+
+  useEffect(() => {
+    console.log("all products input", productInput);
+    console.log("product input image", productInput.image);
+  }, [productInput]);
   return (
     <>
-      <div className="flex justify-center flex-col items-center py-10">
-        <div className="loginFormCard px-[33px] max-w-[500px]">
+      <div className="flex justify-center items-center py-10 gap-x-5">
+        <div className=" px-[33px] max-w-[500px]">
           <div className="header mb-10">
             <h1 className="font-black leading-[49px] text-[36px] text-[#613D2B]">
               Edit Product
@@ -76,22 +93,6 @@ const EditProduct = () => {
                 handleSubmitProduct.mutate(e);
               }}
             >
-              <div>
-                {preview && (
-                  <div className="flex justify-center items-center">
-                    <LazyLoadImage
-                      effect="blur"
-                      src={preview}
-                      style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        objectFit: "cover",
-                      }}
-                      alt={preview}
-                    />
-                  </div>
-                )}
-              </div>
               <input
                 type="text"
                 placeholder="Product Name"
@@ -127,14 +128,32 @@ const EditProduct = () => {
                 type="file"
                 id="upload"
                 name="image"
-                onChange={handleEditInput}
-                value={productInput.image}
-                required
+                onChange={handleEditInputImage}
               />
               <Button className="mt-5 bg-[#613D2B] text-white w-full">
                 Submit
               </Button>
             </form>
+          </div>
+        </div>
+        <div className="rightContent flex flex-col justify-center ">
+          <div>
+            <div>
+              {preview && (
+                <div className="flex justify-center items-center rounded-lg overflow-hidden">
+                  <LazyLoadImage
+                    effect="blur"
+                    src={preview}
+                    style={{
+                      maxWidth: "300px",
+                      maxHeight: "300px",
+                      objectFit: "cover",
+                    }}
+                    alt={preview}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

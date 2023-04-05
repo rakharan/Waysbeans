@@ -23,6 +23,7 @@ const Home = () => {
     setProductData,
     setPreview,
   } = statesFromGlobalContext;
+
   // Fetching product data from database
   let { data: products, refetch } = useQuery("productsCache", async () => {
     const response = await API.get("/products");

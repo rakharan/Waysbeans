@@ -15,6 +15,7 @@ type TransactionRepository interface {
 	GetTransactionMidtrans(ID string) (models.Transaction, error)
 	UpdateTransaction(transaction models.Transaction) (models.Transaction, error)
 	UpdateTransactionMidtrans(status string, ID int) error
+	GetTx(ID int) (models.Transaction, error)
 }
 
 // PRODUCT REPOSITORY FUNCTION
@@ -33,6 +34,13 @@ func (r *repository) FindTransactions() ([]models.Transaction, error) {
 func (r *repository) GetTransactionByUserID(UserID int) (models.Transaction, error) {
 	var transaction models.Transaction
 	err := r.db.Preload("User").Preload("Cart").Preload("Cart.Product").Where("user_id = ?", UserID).Where("status = ?", "waiting").Find(&transaction).Error
+	return transaction, err
+}
+
+func (r *repository) GetTx(ID int) (models.Transaction, error) {
+	var transaction models.Transaction
+	err := r.db.Preload("User").Preload("Cart").Preload("Cart.Product").Where("id = ?", ID).Where("status = ?", "success").Find(&transaction).Error
+
 	return transaction, err
 }
 

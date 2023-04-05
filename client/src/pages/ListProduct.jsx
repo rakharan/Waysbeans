@@ -72,6 +72,7 @@ const ListProduct = () => {
                             objectFit: "cover",
                           }}
                           alt={preview}
+                          className="rounded-lg"
                         />
                       </div>
                     </td>

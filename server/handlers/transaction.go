@@ -1,43 +1,38 @@
 package handlers
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 	dto "waysbeanapi/dto/result"
 	transactiondto "waysbeanapi/dto/transaction"
-	"waysbeanapi/models"
 	"waysbeanapi/repositories"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
-	"gopkg.in/gomail.v2"
 )
 
 type handlerTransaction struct {
 	TransactionRepository repositories.TransactionRepository
+	ProductRepository     repositories.ProductRepository
 }
 
-func HandlerTransaction(TransactionRepository repositories.TransactionRepository) *handlerTransaction {
-	return &handlerTransaction{TransactionRepository}
+func HandlerTransaction(TransactionRepository repositories.TransactionRepository, ProductRepository repositories.ProductRepository) *handlerTransaction {
+	return &handlerTransaction{
+		TransactionRepository: TransactionRepository, ProductRepository: ProductRepository}
 }
 
 func (h *handlerTransaction) UpdateTransaction(c echo.Context) error {
 	userLogin := c.Get("userLogin")
 	userId := userLogin.(jwt.MapClaims)["id"].(float64)
 
-	fmt.Println(userLogin)
-	fmt.Println(userId)
 	request := new(transactiondto.TransactionRequest)
 	if err := c.Bind(&request); err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
-	fmt.Println(request)
 
 	transaction, err := h.TransactionRepository.GetTransactionByUserID(int(userId))
 	if err != nil {
@@ -118,6 +113,16 @@ func (h *handlerTransaction) GetUserTransactionByUserID(c echo.Context) error {
 	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "Success", Data: transactions})
 }
 
+func (h *handlerTransaction) GetTxById(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	tx, err := h.TransactionRepository.GetTx(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "Success", Data: tx})
+}
+
 func (h *handlerTransaction) Notification(c echo.Context) error {
 	var notificationPayload map[string]interface{}
 
@@ -126,7 +131,9 @@ func (h *handlerTransaction) Notification(c echo.Context) error {
 	}
 
 	transactionStatus := notificationPayload["transaction_status"].(string)
+
 	fraudStatus := notificationPayload["fraud_status"].(string)
+
 	orderId := notificationPayload["order_id"].(string)
 
 	transaction, _ := h.TransactionRepository.GetTransactionMidtrans(orderId)
@@ -138,21 +145,22 @@ func (h *handlerTransaction) Notification(c echo.Context) error {
 			h.TransactionRepository.UpdateTransactionMidtrans("pending", int(transaction.ID))
 		} else if fraudStatus == "accept" {
 			// TODO set transaction status on your database to 'success'
-			SendMail("success", transaction)
+			// SendMail("success", transaction)
+			// h.ProductRepository.GetProduct()
 			h.TransactionRepository.UpdateTransactionMidtrans("success", int(transaction.ID))
 		}
 	} else if transactionStatus == "settlement" {
 		// TODO set transaction status on your databaase to 'success'
-		SendMail("success", transaction)
+		// SendMail("success", transaction)
 		h.TransactionRepository.UpdateTransactionMidtrans("success", int(transaction.ID))
 	} else if transactionStatus == "deny" {
 		// TODO you can ignore 'deny', because most of the time it allows payment retries
 		// and later can become success
-		SendMail("failed", transaction)
+		// SendMail("failed", transaction)
 		h.TransactionRepository.UpdateTransactionMidtrans("failed", int(transaction.ID))
 	} else if transactionStatus == "cancel" || transactionStatus == "expire" {
 		// TODO set transaction status on your databaase to 'failure'
-		SendMail("failed", transaction)
+		// SendMail("failed", transaction)
 		h.TransactionRepository.UpdateTransactionMidtrans("waiting", int(transaction.ID))
 	} else if transactionStatus == "pending" {
 		// TODO set transaction status on your databaase to 'pending' / waiting payment
@@ -162,58 +170,58 @@ func (h *handlerTransaction) Notification(c echo.Context) error {
 	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "Success", Data: notificationPayload})
 }
 
-func SendMail(status string, transaction models.Transaction) {
-	if status != transaction.Status && (status == "success") {
-		// GET VARIABLES FROM ENV
-		var CONFIG_SMTP_HOST = "smtp.gmail.com"
-		var CONFIG_SMTP_PORT = 587
-		var CONFIG_SENDER_NAME = "Waysbeans <randhikatamar@gmail.com>"
-		var CONFIG_AUTH_EMAIL = "randhikatamar@gmail.com"
-		var CONFIG_AUTH_PASSWORD = "ncjswmdxmiujouuc"
+// func SendMail(status string, transaction models.Transaction) {
+// 	if status != transaction.Status && (status == "success") {
+// 		// GET VARIABLES FROM ENV
+// 		var CONFIG_SMTP_HOST = "smtp.gmail.com"
+// 		var CONFIG_SMTP_PORT = 587
+// 		var CONFIG_SENDER_NAME = "Waysbeans <randhikatamar@gmail.com>"
+// 		var CONFIG_AUTH_EMAIL = "randhikatamar@gmail.com"
+// 		var CONFIG_AUTH_PASSWORD = "ncjswmdxmiujouuc"
 
-		var productName = transaction.Cart
-		var price = strconv.Itoa(int(transaction.Total))
-		fmt.Println(productName)
+// 		var productName = transaction.Cart
+// 		var price = strconv.Itoa(int(transaction.Total))
+// 		fmt.Println(productName)
 
-		mailer := gomail.NewMessage()
-		mailer.SetHeader("From", CONFIG_SENDER_NAME)
-		mailer.SetHeader("To", transaction.Email)
-		mailer.SetHeader("Subject", "Transaction Status")
-		mailer.SetBody("text/html", fmt.Sprintf(`<!DOCTYPE html>
-	  <html lang="en">
-		<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-		<style>
-		  h1 {
-		  color: brown;
-		  }
-		</style>
-		</head>
-		<body>
-		<h2>Product payment :</h2>
-		<ul style="list-style-type:none;">
-		  <li>Name : %v</li>
-		  <li>Total payment: Rp.%v</li>
-		  <li>Status : <b>%v</b></li>
-		</ul>
-		</body>
-	  </html>`, productName, price, status))
+// 		mailer := gomail.NewMessage()
+// 		mailer.SetHeader("From", CONFIG_SENDER_NAME)
+// 		mailer.SetHeader("To", transaction.Email)
+// 		mailer.SetHeader("Subject", "Transaction Status")
+// 		mailer.SetBody("text/html", fmt.Sprintf(`<!DOCTYPE html>
+// 	  <html lang="en">
+// 		<head>
+// 		<meta charset="UTF-8" />
+// 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+// 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+// 		<title>Document</title>
+// 		<style>
+// 		  h1 {
+// 		  color: brown;
+// 		  }
+// 		</style>
+// 		</head>
+// 		<body>
+// 		<h2>Product payment :</h2>
+// 		<ul style="list-style-type:none;">
+// 		  <li>Name : %v</li>
+// 		  <li>Total payment: Rp.%v</li>
+// 		  <li>Status : <b>%v</b></li>
+// 		</ul>
+// 		</body>
+// 	  </html>`, productName, price, status))
 
-		dialer := gomail.NewDialer(
-			CONFIG_SMTP_HOST,
-			CONFIG_SMTP_PORT,
-			CONFIG_AUTH_EMAIL,
-			CONFIG_AUTH_PASSWORD,
-		)
+// 		dialer := gomail.NewDialer(
+// 			CONFIG_SMTP_HOST,
+// 			CONFIG_SMTP_PORT,
+// 			CONFIG_AUTH_EMAIL,
+// 			CONFIG_AUTH_PASSWORD,
+// 		)
 
-		err := dialer.DialAndSend(mailer)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
+// 		err := dialer.DialAndSend(mailer)
+// 		if err != nil {
+// 			log.Fatal(err.Error())
+// 		}
 
-		log.Println("Mail sent! to " + transaction.Email)
-	}
-}
+// 		log.Println("Mail sent! to " + transaction.Email)
+// 	}
+// }

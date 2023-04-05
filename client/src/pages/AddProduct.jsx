@@ -5,6 +5,8 @@ import { useMutation } from "react-query";
 import { API } from "../config/api";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 const AddProduct = () => {
   document.title = "Waysbeans | Add Product";
@@ -15,6 +17,7 @@ const AddProduct = () => {
   const { productInput, setProductInput, preview, setPreview } =
     statesFromGlobalContext;
   const { handleEditInput } = functionHandlers;
+
   const handleSubmitProduct = useMutation(async (event) => {
     event.preventDefault();
     const config = {
@@ -71,21 +74,6 @@ const AddProduct = () => {
                 handleSubmitProduct.mutate(e);
               }}
             >
-              <div>
-                {preview && (
-                  <div className="flex justify-center items-center">
-                    <img
-                      src={preview}
-                      style={{
-                        maxWidth: "300px",
-                        maxHeight: "300px",
-                        objectFit: "cover",
-                      }}
-                      alt={preview}
-                    />
-                  </div>
-                )}
-              </div>
               <input
                 type="text"
                 name="name"
@@ -140,12 +128,13 @@ const AddProduct = () => {
             </form>
           </div>
         </div>
-        {/* <div className="rightContent flex flex-col justify-center ">
+        <div className="rightContent flex flex-col justify-center ">
           <div>
             <div>
               {preview && (
-                <div className="flex justify-center items-center">
-                  <img
+                <div className="flex justify-center items-center rounded-lg overflow-hidden">
+                  <LazyLoadImage
+                    effect="blur"
                     src={preview}
                     style={{
                       maxWidth: "300px",
@@ -158,7 +147,7 @@ const AddProduct = () => {
               )}
             </div>
           </div>
-        </div> */}
+        </div>
       </div>
     </>
   );
