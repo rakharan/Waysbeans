@@ -1,47 +1,88 @@
 # WaysBeans
 
-WaysBeans is a web application that aims to attract coffee lovers and make them buy coffee from the project website. This application is built using ReactJS with ViteJS as the framework, and uses Tailwind CSS and HTML for styling. The backend is built using Go language and Echo as its framework. Security and authentication are ensured by implementing JWT and Bcrypt. The website is also integrated with a payment gateway called Midtrans.
+Fullstack online coffee shop web application with shopping cart, Midtrans payment gateway, order tracking, and admin dashboard.
 
-## Table of Contents
+Live demo: [https://waysbeans-teal.vercel.app](https://waysbeans-teal.vercel.app)
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+## Architecture
 
-## Installation
+Monorepo separating React client and Go Echo backend:
 
-To run this project locally, you need to have Node.js, Yarn or NPM, and Go installed on your computer.
+```
+Waysbeans/
+├── client/          # Frontend application (React 18 + Vite + Tailwind CSS)
+│   ├── src/
+│   │   ├── components/  # Reusable UI elements
+│   │   ├── context/     # Auth state context
+│   │   ├── pages/       # Catalog, Cart, Profile, Transaction, Admin
+│   │   └── config/      # API client and endpoints
+└── server/          # REST API (Go + Echo + GORM + PostgreSQL)
+    ├── handlers/    # HTTP controllers (auth, product, cart, transaction)
+    ├── repositories/# Database persistence layer
+    ├── models/      # GORM database schemas
+    ├── dto/         # Request / response payload contracts
+    └── pkg/         # JWT, bcrypt, Midtrans Snap client
+```
 
-1. Clone this repository
+## Features
 
-$ git clone https://github.com/rakharan/Waysbeans.git
+- **Product Catalog**: Browsable coffee bean products with detailed descriptions, stock status, and pricing.
+- **Cart & Checkout**: Interactive shopping cart with local state, quantity controls, and total calculations.
+- **Midtrans Payment Gateway**: Snap popup integration for credit card, bank transfer, and e-wallet checkout.
+- **Order Tracking**: Real-time order status tracking (Waiting Payment, Success, Cancel).
+- **Admin Dashboard**: Manage product listings, update prices, and review incoming transactions.
+- **Authentication**: JWT token-based auth with bcrypt password hashing and route guards.
 
-2. Install the frontend dependencies and start the development server
+## Tech Stack
 
-$ cd waysbeans
-$ yarn install
-$ yarn dev
+### Frontend
+- **Framework**: React 18 with Vite
+- **Styling**: Tailwind CSS
+- **State & Routing**: React Router DOM, Context API
+- **Deployment**: Vercel
 
-3. Install the backend dependencies and start the server
+### Backend
+- **Language**: Go 1.20+
+- **Framework**: Echo v4
+- **ORM**: GORM
+- **Database**: PostgreSQL
+- **Payments**: Midtrans Snap API
 
-$ cd server
-$ go mod download
-$ go run main.go
+## Quick Start
 
-## Usage
+### 1. Prerequisites
+- Node.js 18+ & Yarn/npm
+- Go 1.20+
+- PostgreSQL instance running
 
-To use the WaysBeans web application, you can visit the live website at [https://waysbeans-teal.vercel.app/](https://waysbeans-teal.vercel.app/) or run it locally by following the installation instructions above.
+### 2. Clone Repository
 
-## Contributing
+```bash
+git clone https://github.com/rakharan/Waysbeans.git
+cd Waysbeans
+```
 
-If you want to contribute to this project, please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidance.
+### 3. Backend Setup
+
+```bash
+cd server
+go mod download
+# Configure .env with DB credentials and Midtrans Server Key
+go run main.go
+```
+
+Backend boots on `http://localhost:5000`.
+
+### 4. Frontend Setup
+
+```bash
+cd ../client
+npm install
+npm run dev
+```
+
+Frontend boots on `http://localhost:5173`.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE.md).
-
-## Contact
-
-If you have any questions or feedback, you can contact me at [randhikatamar@gmail.com](mailto:randhikatamar@gmail.com).
+MIT
