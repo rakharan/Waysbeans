@@ -1,6 +1,6 @@
 module waysbeanapi
 
-go 1.20
+go 1.22
 
 require (
 	github.com/cloudinary/cloudinary-go/v2 v2.2.0
